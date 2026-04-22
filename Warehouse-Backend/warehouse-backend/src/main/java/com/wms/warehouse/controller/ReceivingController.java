@@ -5,7 +5,6 @@ import com.wms.warehouse.dto.ReceiveShipmentDTO;
 import com.wms.warehouse.dto.ReceivingResponseDTO;
 import com.wms.warehouse.service.PutawayService;
 import com.wms.warehouse.service.ReceivingService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,10 +21,6 @@ public class ReceivingController {
         this.putawayService = putawayService;
     }
 
-    /**
-     * Suggest best bin for incoming product
-     * Use this BEFORE receiving to know where to put items
-     */
     @PostMapping("/suggest-bin")
     public ResponseEntity<PutawaySuggestionDTO> suggestBin(@RequestBody SuggestBinRequest request) {
         PutawaySuggestionDTO suggestion = putawayService.findOptimalBin(
@@ -35,31 +30,28 @@ public class ReceivingController {
         return ResponseEntity.ok(suggestion);
     }
 
-    /**
-     * Receive shipment (CRITICAL ENDPOINT FOR WEEK 2)
-     * This is an ATOMIC operation - all or nothing
-     */
     @PostMapping("/receive")
-    public ResponseEntity<ReceivingResponseDTO> receiveShipment(@Valid @RequestBody ReceiveShipmentDTO request) {
+    public ResponseEntity<ReceivingResponseDTO> receiveShipment(@RequestBody ReceiveShipmentDTO request) {
+        System.out.println("Received request: " + request);
         ReceivingResponseDTO response = receivingService.receiveShipment(request);
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Quick receive with minimal fields
-     */
     @PostMapping("/quick-receive")
     public ResponseEntity<ReceivingResponseDTO> quickReceive(
             @RequestParam String productSku,
             @RequestParam Integer quantity,
             @RequestParam String referenceNumber) {
 
-        ReceiveShipmentDTO request = new ReceiveShipmentDTO(productSku, quantity, referenceNumber);
+        ReceiveShipmentDTO request = new ReceiveShipmentDTO();
+        request.setProductSku(productSku);
+        request.setQuantity(quantity);
+        request.setReferenceNumber(referenceNumber);
+
         ReceivingResponseDTO response = receivingService.receiveShipment(request);
         return ResponseEntity.ok(response);
     }
 
-    // Inner class for suggest-bin request
     static class SuggestBinRequest {
         private String productSku;
         private Integer quantity;

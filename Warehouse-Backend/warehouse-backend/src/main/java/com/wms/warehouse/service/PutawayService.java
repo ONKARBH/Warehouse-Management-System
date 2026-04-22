@@ -6,7 +6,6 @@ import com.wms.warehouse.dto.PutawaySuggestionDTO;
 import com.wms.warehouse.repository.InventoryItemRepository;
 import com.wms.warehouse.repository.StorageBinRepository;
 import org.springframework.stereotype.Service;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -23,68 +22,53 @@ public class PutawayService {
 
     public PutawaySuggestionDTO findOptimalBin(String productSku, Integer quantity) {
 
+        System.out.println("Finding optimal bin for: " + productSku + ", quantity: " + quantity);
+
         // STRATEGY 1: Find bin that already has this product
         List<InventoryItem> existingStock = inventoryRepo.findByProductSku(productSku);
 
-        for (InventoryItem item : existingStock) {
-            StorageBin bin = item.getStorageBin();
+        if (existingStock != null && !existingStock.isEmpty()) {
+            for (InventoryItem item : existingStock) {
+                StorageBin bin = item.getStorageBin();
+                if (bin != null) {
+                    int maxCap = bin.getMaxCapacity() != null ? bin.getMaxCapacity() : 0;
+                    int currOcc = bin.getCurrentOccupancy() != null ? bin.getCurrentOccupancy() : 0;
+                    int availableSpace = maxCap - currOcc;
 
-            // Safe null handling
-            int maxCapacity = getSafeValue(bin.getMaxCapacity());
-            int currentOccupancy = getSafeValue(bin.getCurrentOccupancy());
-            int availableSpace = maxCapacity - currentOccupancy;
-
-            if (availableSpace >= quantity) {
-                return new PutawaySuggestionDTO(
-                        bin.getBinCode(),
-                        availableSpace,
-                        "Consolidate with existing stock (already has " + item.getQuantity() + " units)"
-                );
+                    if (availableSpace >= quantity) {
+                        System.out.println("Found existing bin: " + bin.getBinCode() + " with space: " + availableSpace);
+                        return new PutawaySuggestionDTO(
+                                bin.getBinCode(),
+                                availableSpace,
+                                "Consolidate with existing stock (already has " + item.getQuantity() + " units)"
+                        );
+                    }
+                }
             }
         }
 
-        // STRATEGY 2: Find empty bin
-        List<StorageBin> emptyBins = binRepository.findEmptyBins();
-        if (emptyBins != null && !emptyBins.isEmpty()) {
-            StorageBin bestEmptyBin = emptyBins.get(0);
-            int maxCapacity = getSafeValue(bestEmptyBin.getMaxCapacity());
-            return new PutawaySuggestionDTO(
-                    bestEmptyBin.getBinCode(),
-                    maxCapacity,
-                    "Empty bin available"
-            );
-        }
+        // STRATEGY 2: Get all bins and find first with enough space
+        List<StorageBin> allBins = binRepository.findAll();
 
-        // STRATEGY 3: Find any bin with enough space
-        List<StorageBin> availableBins = binRepository.findAvailableBins();
-        if (availableBins != null && !availableBins.isEmpty()) {
+        if (allBins != null && !allBins.isEmpty()) {
+            for (StorageBin bin : allBins) {
+                int maxCap = bin.getMaxCapacity() != null ? bin.getMaxCapacity() : 0;
+                int currOcc = bin.getCurrentOccupancy() != null ? bin.getCurrentOccupancy() : 0;
+                int availableSpace = maxCap - currOcc;
 
-            // Sort by available space (largest first)
-            availableBins.sort((bin1, bin2) -> {
-                int space1 = getSafeValue(bin1.getMaxCapacity()) - getSafeValue(bin1.getCurrentOccupancy());
-                int space2 = getSafeValue(bin2.getMaxCapacity()) - getSafeValue(bin2.getCurrentOccupancy());
-                return Integer.compare(space2, space1);
-            });
-
-            StorageBin bestBin = availableBins.get(0);
-            int maxCapacity = getSafeValue(bestBin.getMaxCapacity());
-            int currentOccupancy = getSafeValue(bestBin.getCurrentOccupancy());
-            int availableSpace = maxCapacity - currentOccupancy;
-
-            if (availableSpace >= quantity) {
-                return new PutawaySuggestionDTO(
-                        bestBin.getBinCode(),
-                        availableSpace,
-                        "Bin with available space (current occupancy: " + currentOccupancy + ")"
-                );
+                if (availableSpace >= quantity) {
+                    System.out.println("Found available bin: " + bin.getBinCode() + " with space: " + availableSpace);
+                    return new PutawaySuggestionDTO(
+                            bin.getBinCode(),
+                            availableSpace,
+                            "Bin with available space"
+                    );
+                }
             }
         }
 
+        // No bin found
+        System.out.println("No suitable bin found!");
         throw new RuntimeException("No suitable bin found for " + quantity + " units of product " + productSku);
-    }
-
-    // Helper method to handle null Integer values
-    private int getSafeValue(Integer value) {
-        return value != null ? value : 0;
     }
 }

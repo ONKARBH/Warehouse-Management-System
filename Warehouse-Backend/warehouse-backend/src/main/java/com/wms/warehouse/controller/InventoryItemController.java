@@ -1,6 +1,9 @@
 package com.wms.warehouse.controller;
 
 import com.wms.warehouse.entity.InventoryItem;
+import com.wms.warehouse.entity.Product;
+import com.wms.warehouse.entity.StorageBin;
+import com.wms.warehouse.entity.Warehouse;
 import com.wms.warehouse.repository.InventoryItemRepository;
 import com.wms.warehouse.repository.ProductRepository;
 import com.wms.warehouse.repository.StorageBinRepository;
@@ -8,7 +11,9 @@ import com.wms.warehouse.repository.WarehouseRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inventory")
@@ -45,25 +50,41 @@ public class InventoryItemController {
     }
 
     @PostMapping
-    public ResponseEntity<InventoryItem> createInventoryItem(@RequestBody InventoryItem item) {
-        // Fixed: Check if product exists using product ID
-        if (item.getProduct() == null || item.getProduct().getId() == null) {
-            return ResponseEntity.badRequest().body(null);
-        }
-        if (!productRepo.existsById(item.getProduct().getId())) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<?> createInventoryItem(@RequestBody Map<String, Object> request) {
+        try {
+            // Extract IDs from request
+            Map<String, Integer> productMap = (Map<String, Integer>) request.get("product");
+            Map<String, Integer> binMap = (Map<String, Integer>) request.get("storageBin");
+            Map<String, Integer> warehouseMap = (Map<String, Integer>) request.get("warehouse");
+            Integer quantity = (Integer) request.get("quantity");
 
-        // Fixed: Check if bin exists using storage bin ID
-        if (item.getStorageBin() == null || item.getStorageBin().getId() == null) {
-            return ResponseEntity.badRequest().body(null);
-        }
-        if (!binRepo.existsById(item.getStorageBin().getId())) {
-            return ResponseEntity.badRequest().body(null);
-        }
+            Long productId = productMap.get("id").longValue();
+            Long binId = binMap.get("id").longValue();
+            Long warehouseId = warehouseMap.get("id").longValue();
 
-        InventoryItem saved = inventoryRepo.save(item);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            // Fetch entities
+            Product product = productRepo.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+            StorageBin bin = binRepo.findById(binId)
+                    .orElseThrow(() -> new RuntimeException("Bin not found with id: " + binId));
+            Warehouse warehouse = warehouseRepo.findById(warehouseId)
+                    .orElseThrow(() -> new RuntimeException("Warehouse not found with id: " + warehouseId));
+
+            // Create inventory item
+            InventoryItem item = new InventoryItem();
+            item.setProduct(product);
+            item.setStorageBin(bin);
+            item.setWarehouse(warehouse);
+            item.setQuantity(quantity);
+
+            InventoryItem saved = inventoryRepo.save(item);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     @PutMapping("/{id}/quantity")
