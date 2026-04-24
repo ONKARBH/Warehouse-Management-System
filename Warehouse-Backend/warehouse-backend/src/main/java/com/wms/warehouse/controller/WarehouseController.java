@@ -1,4 +1,4 @@
-    package com.wms.warehouse.controller;
+     package com.wms.warehouse.controller;
 
     import com.wms.warehouse.entity.Warehouse;
     import com.wms.warehouse.repository.WarehouseRepository;
