@@ -1,5 +1,6 @@
 package com.wms.warehouse.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class StorageBin {
     private Integer shelfLevel;
     private Integer maxWeight;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aisle_id", nullable = false)
     private Aisle aisle;

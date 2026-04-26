@@ -1,5 +1,6 @@
 package com.wms.warehouse.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +23,11 @@ public class Warehouse {
     private String city;
     private String country;
 
+
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Zone> zones = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<InventoryItem> inventoryItems = new ArrayList<>();
 
