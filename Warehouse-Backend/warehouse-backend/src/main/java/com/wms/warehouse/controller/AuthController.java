@@ -3,6 +3,9 @@ package com.wms.warehouse.controller;
 import com.wms.warehouse.dto.AuthRequestDTO;
 import com.wms.warehouse.dto.AuthResponseDTO;
 import com.wms.warehouse.entity.User;
+import com.wms.warehouse.entity.User.Role;  // If Role inside User
+// OR
+// import com.wms.warehouse.entity.Role;  // If Role is separate
 import com.wms.warehouse.repository.UserRepository;
 import com.wms.warehouse.security.JwtService;
 import org.springframework.http.ResponseEntity;
@@ -34,18 +37,19 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
 
-        if (authentication.isAuthenticated()) {
             User user = userRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             String token = jwtService.generateToken(user.getUsername(), user.getRole().name());
             return ResponseEntity.ok(new AuthResponseDTO(token, user.getUsername(), user.getRole().name(), user.getFullName()));
-        } else {
-            throw new RuntimeException("Invalid credentials");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Login failed: " + e.getMessage());
         }
     }
 
@@ -59,10 +63,10 @@ public class AuthController {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(User.Role.OPERATOR); // Default role
+        user.setRole(User.Role.OPERATOR);  // Default role
         User saved = userRepository.save(user);
-        saved.setPassword(null); // Don't return password
+        saved.setPassword(null);
 
         return ResponseEntity.ok(saved);
-    }
+    }   
 }
