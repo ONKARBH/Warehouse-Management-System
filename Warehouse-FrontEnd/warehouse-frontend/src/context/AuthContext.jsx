@@ -19,15 +19,21 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (username, password) => {
-        const response = await authAPI.login(username, password);
-        const { token, username: userName, role, fullName } = response.data;
-        
-        localStorage.setItem('token', token);
-        const userObj = { username: userName, role, fullName };
-        localStorage.setItem('user', JSON.stringify(userObj));
-        setUser(userObj);
-        
-        return response;
+        try {
+            // Don't add any headers here - let axios interceptor handle it
+            const response = await authAPI.login(username, password);
+            const { token, username: userName, role, fullName } = response.data;
+            
+            localStorage.setItem('token', token);
+            const userObj = { username: userName, role, fullName };
+            localStorage.setItem('user', JSON.stringify(userObj));
+            setUser(userObj);
+            
+            return response;
+        } catch (error) {
+            console.error('Login error:', error.response?.data || error.message);
+            throw error;
+        }
     };
 
     const logout = () => {

@@ -146,3 +146,117 @@ body {
     font-size: 0.8rem;
     color: #666;
 }
+
+/* Inventory Table */
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.inventory-table th,
+.inventory-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.inventory-table th {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.low-stock {
+    background-color: #fff3cd;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.badge.ok {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge.low {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge.out {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Orders */
+.order-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.state-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.state-pending { background-color: #ffc107; color: #333; }
+.state-picking { background-color: #17a2b8; color: white; }
+.state-packed { background-color: #28a745; color: white; }
+.state-shipped { background-color: #6c757d; color: white; }
+.state-cancelled { background-color: #dc3545; color: white; }
+
+/* Picking */
+.picking-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.bin-code {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    letter-spacing: 4px;
+}
+
+.scan-input {
+    font-size: 18px;
+    padding: 12px;
+    width: 100%;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
