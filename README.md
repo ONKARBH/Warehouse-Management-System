@@ -20,18 +20,6 @@ A comprehensive **Warehouse Management System** designed to automate core wareho
 - ✅ **Audit Trail** - Complete stock movement history
 - ✅ **Responsive UI** - Modern React frontend with animations
 
-## 🏗️ Architecture
-
-
-─────────────────────────────────────────────────────────────┐
-│ React Frontend (Port 5173) │
-├─────────────────────────────────────────────────────────────┤
-│ Axios API Calls │
-├─────────────────────────────────────────────────────────────┤
-│ Spring Boot Backend (Port 8081) │
-├─────────────────────────────────────────────────────────────┤
-│ PostgreSQL Database (Port 5432) │
-└─────────────────────────────────────────────────────────────┘
 
 
 
