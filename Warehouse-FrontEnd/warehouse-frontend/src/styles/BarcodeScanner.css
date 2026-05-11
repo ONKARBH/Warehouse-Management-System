@@ -1,0 +1,351 @@
+/* Scanner Overlay */
+.scanner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Scanner Modal */
+.scanner-modal {
+    width: 90%;
+    max-width: 600px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scanner Header */
+.scanner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.scanner-header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.scanner-icon {
+    font-size: 32px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.scanner-header h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.scanner-header p {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.scanner-close {
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scanner-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Scanner Container */
+.scanner-container {
+    padding: 20px;
+}
+
+.scanner-view {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #000;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.scanner-overlay-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scan-frame {
+    position: relative;
+    width: 80%;
+    height: 60%;
+    border-radius: 20px;
+}
+
+.scan-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #00ff88;
+}
+
+.scan-corner.top-left {
+    top: -10px;
+    left: -10px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.scan-corner.top-right {
+    top: -10px;
+    right: -10px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.scan-corner.bottom-left {
+    bottom: -10px;
+    left: -10px;
+    border-right: none;
+    border-top: none;
+}
+
+.scan-corner.bottom-right {
+    bottom: -10px;
+    right: -10px;
+    border-left: none;
+    border-top: none;
+}
+
+.scan-line-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ff88, transparent);
+    animation: scanMove 2s ease-in-out infinite;
+}
+
+@keyframes scanMove {
+    0%, 100% { transform: translateY(0); opacity: 0.3; }
+    50% { transform: translateY(150px); opacity: 1; }
+}
+
+/* Scanner Controls */
+.scanner-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.control-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.scanner-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Scan Success */
+.scan-success {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-radius: 20px;
+    animation: bounceIn 0.5s ease-out;
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.success-animation {
+    margin-bottom: 20px;
+}
+
+.success-circle {
+    font-size: 60px;
+    animation: bounce 0.5s ease-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.scanned-value {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 10px;
+    font-family: monospace;
+    font-size: 18px;
+    margin: 15px 0;
+    word-break: break-all;
+}
+
+.scanned-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.scan-again-btn, .confirm-scan-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.scan-again-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.confirm-scan-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.scan-again-btn:hover, .confirm-scan-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Scanner Error */
+.scanner-error {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    border-radius: 20px;
+}
+
+.error-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.scanner-error h3 {
+    color: #721c24;
+    margin-bottom: 10px;
+}
+
+.scanner-error p {
+    color: #721c24;
+    font-size: 14px;
+}
+
+.error-hint {
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.scanner-error button {
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: #dc3545;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .scanner-modal {
+        width: 95%;
+    }
+    
+    .scanner-header {
+        padding: 15px 20px;
+    }
+    
+    .scanner-header h3 {
+        font-size: 16px;
+    }
+    
+    .scanned-actions {
+        flex-direction: column;
+    }
+    
+    .scanner-controls {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,204 @@
+.picking {
+    animation: fadeInUp 0.5s ease-out;
+    padding: 20px;
+}
+
+.picking h2 {
+    color: white;
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+.no-tasks-card {
+    background: white;
+    border-radius: 20px;
+    padding: 60px 30px;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.no-tasks-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+}
+
+.no-tasks-card h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.picking-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.task-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-details {
+    padding: 25px;
+}
+
+.product-info {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.product-info h4 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.sku {
+    color: #666;
+    font-size: 14px;
+}
+
+.quantity {
+    font-size: 18px;
+    color: #667eea;
+}
+
+.quantity strong {
+    font-size: 28px;
+    color: #764ba2;
+}
+
+.location-info {
+    text-align: center;
+}
+
+.location-info h4 {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.bin-code {
+    font-size: 48px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 5px;
+    margin: 15px 0;
+}
+
+.instruction {
+    color: #999;
+    font-size: 12px;
+}
+
+.scan-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin: 0 20px 20px 20px;
+    border-radius: 15px;
+}
+
+.scan-form {
+    display: flex;
+    gap: 15px;
+}
+
+.scan-input {
+    flex: 1;
+    padding: 15px 20px;
+    font-size: 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.scan-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.scan-form button {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 12px;
+    margin: 0 20px 20px 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    margin: 0 20px 20px 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.pending-tasks {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 25px;
+    max-width: 600px;
+    margin: 25px auto 0;
+}
+
+.pending-tasks h4 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.pending-tasks ul {
+    list-style: none;
+}
+
+.pending-tasks li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.pending-badge {
+    background: #ffc107;
+    color: #856404;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .scan-form {
+        flex-direction: column;
+    }
+    
+    .bin-code {
+        font-size: 32px;
+    }
+}

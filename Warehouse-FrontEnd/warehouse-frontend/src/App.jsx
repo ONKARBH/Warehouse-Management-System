@@ -8,6 +8,7 @@ import Inventory from './components/Inventory';
 import Orders from './components/Orders';
 import Picking from './components/Picking';
 import Navbar from './components/Navbar';
+import Admin from './components/Admin';
 import './styles/global.css';
 import './styles/global.css';
 import './styles/Inventory.css';
@@ -32,6 +33,12 @@ function AppContent() {
             <div className="container">
                 <Routes>
                     <Route path="/login" element={<Login />} />
+                    <Route path="/admin" element={
+                        <PrivateRoute>
+                                 <Admin />
+                              
+                        </PrivateRoute>
+                    } />
                     <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
                     <Route path="/receiving" element={<PrivateRoute><Receiving /></PrivateRoute>} />
                     <Route path="/inventory" element={<PrivateRoute><Inventory /></PrivateRoute>} />
