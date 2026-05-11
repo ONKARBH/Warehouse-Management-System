@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByOrderNumber(String orderNumber);
-    List<Order> findByState(Order.OrderState state);
+    List<Order> findByState(Order.OrderState state);  // ← THIS METHOD MUST EXIST
     List<Order> findByCustomerEmail(String email);
 }

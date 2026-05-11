@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/inventory")
@@ -35,24 +36,95 @@ public class InventoryItemController {
     }
 
     @GetMapping
-    public List<InventoryItem> getAllInventory() {
-        return inventoryRepo.findAll();
+    public List<Map<String, Object>> getAllInventory() {
+        List<InventoryItem> items = inventoryRepo.findAll();
+
+        // Convert to DTO with explicit data
+        return items.stream().map(item -> {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("id", item.getId());
+            dto.put("quantity", item.getQuantity());
+
+            // Add product details
+            if (item.getProduct() != null) {
+                Map<String, Object> productMap = new HashMap<>();
+                productMap.put("id", item.getProduct().getId());
+                productMap.put("sku", item.getProduct().getSku());
+                productMap.put("name", item.getProduct().getName());
+                dto.put("product", productMap);
+            }
+
+            // Add storage bin details
+            if (item.getStorageBin() != null) {
+                Map<String, Object> binMap = new HashMap<>();
+                binMap.put("id", item.getStorageBin().getId());
+                binMap.put("binCode", item.getStorageBin().getBinCode());
+                dto.put("storageBin", binMap);
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @GetMapping("/product/{sku}")
-    public List<InventoryItem> getInventoryByProduct(@PathVariable String sku) {
-        return inventoryRepo.findByProductSku(sku);
+    public List<Map<String, Object>> getInventoryByProduct(@PathVariable String sku) {
+        List<InventoryItem> items = inventoryRepo.findByProductSku(sku);
+
+        return items.stream().map(item -> {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("id", item.getId());
+            dto.put("quantity", item.getQuantity());
+
+            if (item.getProduct() != null) {
+                Map<String, Object> productMap = new HashMap<>();
+                productMap.put("id", item.getProduct().getId());
+                productMap.put("sku", item.getProduct().getSku());
+                productMap.put("name", item.getProduct().getName());
+                dto.put("product", productMap);
+            }
+
+            if (item.getStorageBin() != null) {
+                Map<String, Object> binMap = new HashMap<>();
+                binMap.put("id", item.getStorageBin().getId());
+                binMap.put("binCode", item.getStorageBin().getBinCode());
+                dto.put("storageBin", binMap);
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @GetMapping("/bin/{binCode}")
-    public List<InventoryItem> getInventoryByBin(@PathVariable String binCode) {
-        return inventoryRepo.findByStorageBin_BinCode(binCode);
+    public List<Map<String, Object>> getInventoryByBin(@PathVariable String binCode) {
+        List<InventoryItem> items = inventoryRepo.findByStorageBin_BinCode(binCode);
+
+        return items.stream().map(item -> {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("id", item.getId());
+            dto.put("quantity", item.getQuantity());
+
+            if (item.getProduct() != null) {
+                Map<String, Object> productMap = new HashMap<>();
+                productMap.put("id", item.getProduct().getId());
+                productMap.put("sku", item.getProduct().getSku());
+                productMap.put("name", item.getProduct().getName());
+                dto.put("product", productMap);
+            }
+
+            if (item.getStorageBin() != null) {
+                Map<String, Object> binMap = new HashMap<>();
+                binMap.put("id", item.getStorageBin().getId());
+                binMap.put("binCode", item.getStorageBin().getBinCode());
+                dto.put("storageBin", binMap);
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @PostMapping
     public ResponseEntity<?> createInventoryItem(@RequestBody Map<String, Object> request) {
         try {
-            // Extract IDs from request
             Map<String, Integer> productMap = (Map<String, Integer>) request.get("product");
             Map<String, Integer> binMap = (Map<String, Integer>) request.get("storageBin");
             Map<String, Integer> warehouseMap = (Map<String, Integer>) request.get("warehouse");
@@ -62,7 +134,6 @@ public class InventoryItemController {
             Long binId = binMap.get("id").longValue();
             Long warehouseId = warehouseMap.get("id").longValue();
 
-            // Fetch entities
             Product product = productRepo.findById(productId)
                     .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
             StorageBin bin = binRepo.findById(binId)
@@ -70,7 +141,6 @@ public class InventoryItemController {
             Warehouse warehouse = warehouseRepo.findById(warehouseId)
                     .orElseThrow(() -> new RuntimeException("Warehouse not found with id: " + warehouseId));
 
-            // Create inventory item
             InventoryItem item = new InventoryItem();
             item.setProduct(product);
             item.setStorageBin(bin);
@@ -78,8 +148,23 @@ public class InventoryItemController {
             item.setQuantity(quantity);
 
             InventoryItem saved = inventoryRepo.save(item);
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
 
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", saved.getId());
+            response.put("quantity", saved.getQuantity());
+
+            Map<String, Object> productRes = new HashMap<>();
+            productRes.put("id", product.getId());
+            productRes.put("sku", product.getSku());
+            productRes.put("name", product.getName());
+            response.put("product", productRes);
+
+            Map<String, Object> binRes = new HashMap<>();
+            binRes.put("id", bin.getId());
+            binRes.put("binCode", bin.getBinCode());
+            response.put("storageBin", binRes);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());

@@ -3,9 +3,6 @@ package com.wms.warehouse.controller;
 import com.wms.warehouse.dto.AuthRequestDTO;
 import com.wms.warehouse.dto.AuthResponseDTO;
 import com.wms.warehouse.entity.User;
-import com.wms.warehouse.entity.User.Role;  // If Role inside User
-// OR
-// import com.wms.warehouse.entity.Role;  // If Role is separate
 import com.wms.warehouse.repository.UserRepository;
 import com.wms.warehouse.security.JwtService;
 import org.springframework.http.ResponseEntity;
@@ -48,25 +45,31 @@ public class AuthController {
             String token = jwtService.generateToken(user.getUsername(), user.getRole().name());
             return ResponseEntity.ok(new AuthResponseDTO(token, user.getUsername(), user.getRole().name(), user.getFullName()));
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("Login failed: " + e.getMessage());
         }
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username already exists");
-        }
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
+    public ResponseEntity<?> register(@RequestBody User user) {
+        try {
+            if (userRepository.existsByUsername(user.getUsername())) {
+                return ResponseEntity.badRequest().body("Username already exists");
+            }
+            if (userRepository.existsByEmail(user.getEmail())) {
+                return ResponseEntity.badRequest().body("Email already exists");
+            }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(User.Role.OPERATOR);  // Default role
-        User saved = userRepository.save(user);
-        saved.setPassword(null);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            if (user.getRole() == null) {
+                user.setRole(User.Role.OPERATOR);
+            }
+            user.setEnabled(true);
+            User saved = userRepository.save(user);
+            saved.setPassword(null);
 
-        return ResponseEntity.ok(saved);
-    }   
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Registration failed: " + e.getMessage());
+        }
+    }
 }

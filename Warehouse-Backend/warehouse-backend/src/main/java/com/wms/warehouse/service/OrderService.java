@@ -8,8 +8,8 @@ import com.wms.warehouse.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -35,14 +35,12 @@ public class OrderService {
     // Create new order
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO request) {
-        // Generate order number
         String orderNumber = "ORD-" + System.currentTimeMillis();
 
         Order order = new Order(orderNumber, request.getCustomerName());
         order.setCustomerEmail(request.getCustomerEmail());
         order.setShippingAddress(request.getShippingAddress());
 
-        // Add order lines
         for (OrderRequestDTO.OrderLineDTO lineDTO : request.getOrderLines()) {
             Product product = productRepository.findBySku(lineDTO.getProductSku())
                     .orElseThrow(() -> new RuntimeException("Product not found: " + lineDTO.getProductSku()));
@@ -66,17 +64,17 @@ public class OrderService {
     public List<OrderResponseDTO> getAllOrders() {
         return orderRepository.findAll().stream()
                 .map(OrderResponseDTO::fromEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    // Get orders by state
+    // ADD THIS MISSING METHOD - FIXES THE ERROR
     public List<OrderResponseDTO> getOrdersByState(Order.OrderState state) {
         return orderRepository.findByState(state).stream()
                 .map(OrderResponseDTO::fromEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    // Transition order state - CRITICAL: Stock decrement happens at PACKED
+    // Transition order state
     @Transactional
     public OrderResponseDTO transitionOrderState(String orderNumber, String newState) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
@@ -85,14 +83,11 @@ public class OrderService {
         Order.OrderState targetState = Order.OrderState.valueOf(newState);
         Order.OrderState currentState = order.getState();
 
-        // Handle state transitions
         if (targetState == Order.OrderState.PICKING && currentState == Order.OrderState.PENDING) {
-            // Check stock availability before moving to PICKING
             checkStockAvailability(order);
             order.transitionToPicking();
 
         } else if (targetState == Order.OrderState.PACKED && currentState == Order.OrderState.PICKING) {
-            // CRITICAL: Decrement stock when moving to PACKED
             decrementStock(order);
             order.transitionToPacked();
 
@@ -101,7 +96,6 @@ public class OrderService {
 
         } else if (targetState == Order.OrderState.CANCELLED) {
             if (currentState == Order.OrderState.PICKING) {
-                // Return stock to inventory if cancelling during picking
                 returnStockToInventory(order);
             }
             order.transitionToCancelled();
@@ -113,7 +107,6 @@ public class OrderService {
         return OrderResponseDTO.fromEntity(updated);
     }
 
-    // Check if sufficient stock is available
     private void checkStockAvailability(Order order) {
         for (OrderLine line : order.getOrderLines()) {
             String sku = line.getProduct().getSku();
@@ -126,13 +119,11 @@ public class OrderService {
         }
     }
 
-    // CRITICAL: Decrement stock when order is PACKED
     private void decrementStock(Order order) {
         for (OrderLine line : order.getOrderLines()) {
             Product product = line.getProduct();
             int remainingToPick = line.getQuantity();
 
-            // Find all bins containing this product (FIFO - oldest first)
             List<InventoryItem> stockLocations = inventoryRepo.findByProductSku(product.getSku());
 
             for (InventoryItem item : stockLocations) {
@@ -142,19 +133,20 @@ public class OrderService {
                 int oldQuantity = item.getQuantity();
                 int newQuantity = oldQuantity - pickQuantity;
 
-                // Update inventory
                 item.setQuantity(newQuantity);
                 inventoryRepo.save(item);
 
-                // Update bin occupancy
-                StorageBin bin = item.getStorageBin();
-                bin.setCurrentOccupancy(bin.getCurrentOccupancy() - pickQuantity);
+                // Get warehouse safely
+                Warehouse warehouse = null;
+                if (item.getStorageBin() != null && item.getStorageBin().getAisle() != null
+                        && item.getStorageBin().getAisle().getZone() != null) {
+                    warehouse = item.getStorageBin().getAisle().getZone().getWarehouse();
+                }
 
-                // Record stock movement
                 StockMovement movement = new StockMovement();
                 movement.setProduct(product);
-                movement.setStorageBin(bin);
-                movement.setWarehouse(bin.getWarehouse());
+                movement.setStorageBin(item.getStorageBin());
+                movement.setWarehouse(warehouse);
                 movement.setMovementType(StockMovement.MovementType.PICKED);
                 movement.setQuantityChange(-pickQuantity);
                 movement.setQuantityBefore(oldQuantity);
@@ -162,6 +154,12 @@ public class OrderService {
                 movement.setReferenceNumber(order.getOrderNumber());
                 movement.setUserId("SYSTEM");
                 movementRepo.save(movement);
+
+                // Update bin occupancy
+                StorageBin bin = item.getStorageBin();
+                if (bin != null) {
+                    bin.setCurrentOccupancy(bin.getCurrentOccupancy() - pickQuantity);
+                }
 
                 remainingToPick -= pickQuantity;
             }
@@ -173,11 +171,8 @@ public class OrderService {
         }
     }
 
-    // Return stock to inventory when order is cancelled during picking
     private void returnStockToInventory(Order order) {
         for (OrderLine line : order.getOrderLines()) {
-            // This would need to track which bins were picked from
-            // For simplicity, we add back to first available bin
             List<InventoryItem> stockLocations = inventoryRepo.findByProductSku(line.getProduct().getSku());
             if (!stockLocations.isEmpty()) {
                 InventoryItem item = stockLocations.get(0);
@@ -185,7 +180,6 @@ public class OrderService {
                 item.setQuantity(oldQuantity + line.getQuantity());
                 inventoryRepo.save(item);
 
-                // Record movement
                 StockMovement movement = new StockMovement();
                 movement.setProduct(line.getProduct());
                 movement.setMovementType(StockMovement.MovementType.RETURNED);
