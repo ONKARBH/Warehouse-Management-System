@@ -102,3 +102,29 @@ Product (1) ──→ (N) InventoryItem
 InventoryItem (N) ──→ (1) StockMovement
 Order (1) ──→ (N) OrderLine
 OrderLine (N) ──→ (1) Product
+
+
+🚀 Getting Started
+Prerequisites
+Java 17 or higher
+
+Node.js 18+ and npm
+
+PostgreSQL 15+
+
+Maven (or use included wrapper)
+
+
+Installation
+1. Clone the Repository
+git clone https://github.com/yourusername/warehouse-management-system.git
+cd warehouse-management-system
+
+2. Setup Database
+-- Create database
+CREATE DATABASE wms_db;
+
+-- Update application.properties with your credentials
+spring.datasource.url=jdbc:postgresql://localhost:5432/wms_db
+spring.datasource.username=postgres
+spring.datasource.password=your_password
