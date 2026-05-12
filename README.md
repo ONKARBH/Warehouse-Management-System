@@ -128,3 +128,57 @@ CREATE DATABASE wms_db;
 spring.datasource.url=jdbc:postgresql://localhost:5432/wms_db
 spring.datasource.username=postgres
 spring.datasource.password=your_password
+
+3. Run Backend
+cd backend/warehouse-backend
+./mvnw clean install
+./mvnw spring-boot:run
+
+4. Run Frontend
+cd frontend/warehouse-frontend
+npm install
+npm run dev
+
+
+🔑 Default Credentials
+
+Role	Username	Password
+Admin	admin	admin123
+Operator	operator	operator123
+
+📡 API Endpoints
+Authentication
+Method	Endpoint	Description
+POST	/api/auth/login	User login
+POST	/api/auth/register	Register new user (Admin only)
+
+Products
+Method	Endpoint	Description
+GET	/api/products	Get all products
+GET	/api/products/{id}	Get product by ID
+GET	/api/products/sku/{sku}	Get product by SKU
+POST	/api/products	Create product (Admin only)
+PUT	/api/products/{id}	Update product (Admin only)
+DELETE	/api/products/{id}	Delete product (Admin only)
+
+Inventory
+Method	Endpoint	Description
+GET	/api/inventory	Get all inventory
+GET	/api/inventory/product/{sku}	Get inventory by product
+POST	/api/inventory	Create inventory item
+
+Receiving
+Method	Endpoint	Description
+POST	/api/receiving/suggest-bin	Get putaway suggestion
+POST	/api/receiving/receive	Receive shipment (Transactional)
+
+Orders
+Method	Endpoint	Description
+GET	/api/orders	Get all orders
+POST	/api/orders	Create order
+PUT	/api/orders/{number}/state	Update order state
+
+Barcode
+Method	Endpoint	Description
+GET	/api/barcode/product/{sku}	Generate product barcode
+GET	/api/barcode/qrcode/{sku}	Generate product QR code
