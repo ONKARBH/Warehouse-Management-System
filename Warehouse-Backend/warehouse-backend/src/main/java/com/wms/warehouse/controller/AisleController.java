@@ -5,6 +5,7 @@ import com.wms.warehouse.repository.AisleRepository;
 import com.wms.warehouse.repository.ZoneRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -20,39 +21,31 @@ public class AisleController {
         this.zoneRepository = zoneRepository;
     }
 
-    // GET all aisles
+    // GET all aisles - Both Admin and Operator can view
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     public List<Aisle> getAllAisles() {
         return aisleRepository.findAll();
     }
 
     // GET aisle by ID
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     public ResponseEntity<Aisle> getAisleById(@PathVariable Long id) {
         return aisleRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // GET aisles by zone
-    @GetMapping("/zone/{zoneId}")
-    public List<Aisle> getAislesByZone(@PathVariable Long zoneId) {
-        return aisleRepository.findByZoneId(zoneId);
-    }
-
-    // GET aisles by warehouse
-    @GetMapping("/warehouse/{warehouseId}")
-    public List<Aisle> getAislesByWarehouse(@PathVariable Long warehouseId) {
-        return aisleRepository.findByWarehouseId(warehouseId);
-    }
-
-    // POST create new aisle
+    // POST create aisle - Only Admin
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Aisle> createAisle(@RequestBody Aisle aisle) {
         // Validate zone exists
         if (aisle.getZone() == null || aisle.getZone().getId() == null) {
             return ResponseEntity.badRequest().build();
         }
+
         if (!zoneRepository.existsById(aisle.getZone().getId())) {
             return ResponseEntity.badRequest().build();
         }
@@ -63,6 +56,7 @@ public class AisleController {
 
     // PUT update aisle
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Aisle> updateAisle(@PathVariable Long id, @RequestBody Aisle aisleDetails) {
         return aisleRepository.findById(id)
                 .map(aisle -> {
@@ -75,6 +69,7 @@ public class AisleController {
 
     // DELETE aisle
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteAisle(@PathVariable Long id) {
         if (!aisleRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
