@@ -45,10 +45,15 @@ export const warehouseAPI = {
 };
 
 // ==================== AISLE APIs ====================
+// ==================== AISLE APIs ====================
 export const aisleAPI = {
-    getAll: () => api.get('/aisles'),
+    getAll: () => {
+        console.log("Calling GET /aisles");
+        return api.get('/aisles');
+    },
     getById: (id) => api.get(`/aisles/${id}`),
     create: (data) => api.post('/aisles', data),
+    update: (id, data) => api.put(`/aisles/${id}`, data),
     delete: (id) => api.delete(`/aisles/${id}`),
 };
 // ==================== BIN APIs ====================

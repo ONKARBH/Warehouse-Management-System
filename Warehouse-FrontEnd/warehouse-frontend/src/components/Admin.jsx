@@ -169,20 +169,38 @@ const Admin = () => {
         }
     };
 
-    // ==================== BIN FUNCTIONS ====================
-    const fetchBins = async () => {
-        setLoading(true);
-        try {
-            const response = await binAPI.getAll();
-            console.log("✅ Bins loaded:", response.data);
-            setBins(response.data || []);
-        } catch (error) {
-            console.error("Failed to load bins:", error);
-            showMessage('error', 'Failed to load bins');
-        } finally {
-            setLoading(false);
+   // ==================== BIN FUNCTIONS (FIXED) ====================
+const fetchBins = async () => {
+    setLoading(true);
+    try {
+        const response = await binAPI.getAll();
+        console.log("✅ Bins loaded:", response.data);
+        setBins(response.data || []);
+    } catch (error) {
+        console.error("Failed to load bins:", error);
+        showMessage('error', 'Failed to load bins');
+    } finally {
+        setLoading(false);
+    }
+};
+
+const fetchAisles = async () => {
+    try {
+        console.log("Fetching aisles...");
+        const response = await aisleAPI.getAll();
+        console.log("✅ Aisles API response:", response);
+        console.log("✅ Aisles data:", response.data);
+        setAisles(response.data || []);
+        
+        if (response.data && response.data.length === 0) {
+            console.log("⚠️ No aisles found in database");
         }
-    };
+    } catch (error) {
+        console.error("Failed to load aisles:", error);
+        console.error("Error details:", error.response?.data);
+        setAisles([]);
+    }
+};
 
     const fetchAisles = async () => {
         try {
