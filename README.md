@@ -201,3 +201,21 @@ SHIPPED Order shipped to customer
 CANCELLED Order cancelled
 
 
+👥 Role-Based Access
+
+Feature ADMIN OPERATOR
+View Products ✅ ✅
+Create/Update/Delete Products ✅ ❌
+View Inventory ✅ ✅
+Receive Shipments ✅ ✅
+Create/Update Orders ✅ ✅
+Manage Users ✅ ❌
+Manage Warehouses/Bins ✅ ❌
+
+🎯 Putaway Algorithm
+
+The system automatically finds the optimal bin location using this priority strategy:
+
+1. Consolidation - Same product bin if space available
+2. Empty Bin - Completely empty bin
+3. Available Space - Any bin with sufficient capacity
