@@ -219,3 +219,48 @@ The system automatically finds the optimal bin location using this priority stra
 1. Consolidation - Same product bin if space available
 2. Empty Bin - Completely empty bin
 3. Available Space - Any bin with sufficient capacity
+
+
+```java
+// Priority 1: Same product bin
+if (existingStock exists && availableSpace >= quantity) {
+    return existingBin;
+}
+// Priority 2: Empty bin
+else if (emptyBin exists) {
+    return emptyBin;
+}
+// Priority 3: Any bin with space
+else {
+    return binWithMostSpace;
+}
+```
+
+🧪 Testing
+
+Backend Tests
+
+```bash
+cd backend/warehouse-backend
+./mvnw test
+```
+
+API Testing with Postman
+
+Import the provided Postman collection and test:
+
+1. Login to get JWT token
+2. Add token to Authorization header
+3. Test protected endpoints
+
+Sample API Calls
+
+```bash
+# Login
+curl -X POST http://localhost:8081/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Get products (with token)
+curl -X GET http://localhost:8081/api/products \
+  -H "Authorization: Bearer YOUR_TOKEN"
