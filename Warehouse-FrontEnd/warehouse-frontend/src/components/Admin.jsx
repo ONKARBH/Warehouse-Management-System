@@ -184,24 +184,6 @@ const fetchBins = async () => {
     }
 };
 
-const fetchAisles = async () => {
-    try {
-        console.log("Fetching aisles...");
-        const response = await aisleAPI.getAll();
-        console.log("✅ Aisles API response:", response);
-        console.log("✅ Aisles data:", response.data);
-        setAisles(response.data || []);
-        
-        if (response.data && response.data.length === 0) {
-            console.log("⚠️ No aisles found in database");
-        }
-    } catch (error) {
-        console.error("Failed to load aisles:", error);
-        console.error("Error details:", error.response?.data);
-        setAisles([]);
-    }
-};
-
     const fetchAisles = async () => {
         try {
             const response = await aisleAPI.getAll();
