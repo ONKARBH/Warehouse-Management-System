@@ -182,3 +182,22 @@ Barcode
 Method	Endpoint	Description
 GET	/api/barcode/product/{sku}	Generate product barcode
 GET	/api/barcode/qrcode/{sku}	Generate product QR code
+
+🔄 Order State Machine
+
+```
+PENDING → PICKING → PACKED → SHIPPED
+    ↓         ↓
+ (Created)  (Stock Checked)
+                ↓
+            (Stock Decremented)
+```
+
+State Description
+PENDING Order created, stock not allocated
+PICKING Stock checked, pick list generated
+PACKED Items packed, STOCK DECREMENTS HERE
+SHIPPED Order shipped to customer
+CANCELLED Order cancelled
+
+
